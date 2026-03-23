@@ -101,6 +101,43 @@ npx hardhat test
 ```bash
 npx hardhat run scripts/deploy.js --network rootstockTestnet
 ```
+## Rules Enforced by the Contract
+
+| Rule | How It Is Enforced |
+|------|--------------------|
+| Admin cannot be beneficiary | `setup()` reverts if `_beneficiary == admin` |
+| Contract must be funded before setup | `setup()` checks `contractBalance >= _allocation` |
+| Setup can only happen once | `isConfigured` flag blocks second call |
+| No withdrawal before cliff | `withdraw()` reverts if `block.timestamp < startTime + cliffPeriod` |
+| 20% penalty on unvested excess | Penalty calculated on `amount - withdrawableNow` only |
+| Penalty stays in contract | Deducted from transfer, added to `penaltyPool` |
+| Cannot withdraw more than allocated | `require(amount <= remaining)` |
+| Zero address rejected | Checked in `setup()` and `constructor()` |
+| Reentrancy blocked | `nonReentrant` modifier + checks-effects-interactions pattern |
+
+## Design Choices and Reasoning
+
+**Pull pattern over push**
+Beneficiary initiates withdrawals rather than the contract pushing funds automatically. This eliminates reentrancy risk and removes the gas cost of looping over recipients on every payment received.
+
+**Fund first then setup**
+Admin must deposit DOC before adding a beneficiary. This ensures every allocation is backed by real tokens from the moment the promise is made — the contract cannot make promises it cannot keep.
+
+**Cliff does not pause vesting**
+The vesting clock runs from `startTime` regardless of the cliff. The cliff only blocks the `withdraw()` call. This means when the cliff ends the beneficiary can immediately claim everything vested since day one — consistent with standard vesting contract behaviour.
+
+**Penalty on unvested excess only**
+The 20% penalty applies only to the portion being withdrawn beyond what has vested — not the full withdrawal amount. This is fairer and incentivises waiting rather than punishing partial early withdrawals too harshly.
+
+**Withdrawn tracks full requested amount**
+`withdrawn` records the full amount requested including the penalised portion, not just what was received. This prevents a beneficiary from re-claiming tokens already consumed as a penalty in a previous withdrawal.
+
+**Admin and beneficiary are always separate**
+Enforced in code — `setup()` reverts if the beneficiary address matches the admin. This removes the conflict of interest where an admin could grant themselves vesting allocations.
+
+**Single beneficiary design**
+Deliberately simplified to one beneficiary per contract. This eliminates share rebalancing complexity, makes the accounting trivially auditable, and keeps gas costs predictable. Multiple beneficiaries would require a separate contract deployment — a clean separation of concerns.
+
 ## Roadmap
 
 - [x] Smart contract written and tested
