@@ -1,57 +1,112 @@
-# Sample Hardhat 3 Beta Project (`mocha` and `ethers`)
+# DOC Vesting Contract
 
-This project showcases a Hardhat 3 Beta project using `mocha` for tests and the `ethers` library for Ethereum interactions.
+A time-locked vesting vault for DOC tokens built on Rootstock (RSK) blockchain.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+## What It Does
 
-## Project Overview
+A smart contract where an admin deposits DOC tokens for a single beneficiary. 
+The tokens unlock linearly over a set time period. The beneficiary can withdraw 
+anytime, but pulling out before fully vested costs a 20% penalty on the unvested 
+portion — which stays in the contract.
 
-This example project includes:
+## Contract Address (RSK Testnet)
+```
+0x4F2114dd5f80E54571C75F4eaB3E2fF913755DCa
+```
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using `mocha` and ethers.js
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+Verified on: https://explorer.testnet.rootstock.io/address/0x4F2114dd5f80E54571C75F4eaB3E2fF913755DCa
 
-## Usage
+## State Machine
+```
+NOT_CONFIGURED → LOCKED → VESTING → COMPLETE
+```
 
-### Running Tests
+| State | Description |
+|-------|-------------|
+| NOT_CONFIGURED | Contract deployed, no beneficiary set yet |
+| LOCKED | Before cliff ends, no withdrawals allowed |
+| VESTING | Cliff passed, tokens unlocking linearly |
+| COMPLETE | Vesting period over, all tokens available penalty-free |
 
-To run all the tests in the project, execute the following command:
+## Key Features
 
-```shell
+- Linear vesting over a configurable time period
+- Optional cliff period before any withdrawal is allowed
+- 20% penalty on unvested excess withdrawals
+- Penalty stays in the contract
+- Pull pattern — beneficiary withdraws when ready
+- Admin and beneficiary are always separate wallets
+
+## How It Works
+
+1. Admin deploys the contract with the DOC token address
+2. Admin funds the contract with DOC tokens
+3. Admin sets up the beneficiary with an allocation and vesting schedule
+4. Beneficiary withdraws vested tokens over time
+
+## Scenarios Covered
+
+| # | Scenario | Description |
+|---|----------|-------------|
+| 1 | Deploy | Contract starts in NOT_CONFIGURED state |
+| 2 | Fund | Admin deposits DOC before setting up beneficiary |
+| 3 | Setup | Admin assigns beneficiary, allocation, vesting period and cliff |
+| 4 | Locked | Withdrawal reverts during cliff period |
+| 5 | Normal withdrawal | Beneficiary pulls within vested amount, no penalty |
+| 6 | Early exit | Beneficiary pulls beyond vested amount, 20% penalty applied |
+| 7 | Complete | Vesting period over, full amount available penalty-free |
+
+## Test Suite
+
+80 tests across two files covering full functional and security coverage.
+```bash
 npx hardhat test
 ```
 
-You can also selectively run the Solidity or `mocha` tests:
+| File | Tests | Coverage |
+|------|-------|----------|
+| DOCVesting.test.js | 34 | 7 functional scenarios |
+| DOCVesting.security.test.js | 46 | 9 security audit categories |
 
-```shell
-npx hardhat test solidity
-npx hardhat test mocha
+### Security Audit Categories
+
+1. Reentrancy protection
+2. Access control
+3. Integer accounting
+4. Penalty calculation edge cases
+5. Configuration lock
+6. Vesting math integrity
+7. ERC-20 safety
+8. Event emission
+9. Boundary timing edge cases
+
+## Tech Stack
+
+- Solidity `^0.8.20`
+- Hardhat `v2.22`
+- OpenZeppelin Contracts `v5.6.1`
+- Rootstock (RSK) Testnet
+- DOC Token (Dollar on Chain)
+
+## Setup
+```bash
+npm install
+npx hardhat compile
+npx hardhat test
 ```
 
-### Make a deployment to Sepolia
-
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
-
-To run the deployment to a local chain:
-
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
+## Deploy
+```bash
+npx hardhat run scripts/deploy.js --network rootstockTestnet
 ```
+## Roadmap
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+- [x] Smart contract written and tested
+- [x] Security audit tests written
+- [x] Deployed to RSK Testnet
+- [x] Contract verified on explorer
+- [ ] UI — in progress (Replit, HTML/CSS/JS + Ethers.js)
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+## Author
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
-
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
-
-After setting the variable, you can run the deployment with the Sepolia network:
-
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+Michael Mushunje
