@@ -13,8 +13,10 @@ portion — which stays in the contract.
 ```
 0x4F2114dd5f80E54571C75F4eaB3E2fF913755DCa
 ```
+Verified on Rootstock Testnet Explorer:
+`https://rootstock-testnet.blockscout.com/address/0x4F2114dd5f80E54571C75F4eaB3E2fF913755DCa`
 
-Verified on: https://explorer.testnet.rootstock.io/address/0x4F2114dd5f80E54571C75F4eaB3E2fF913755DCa
+> Note: Copy and paste the link above directly into your browser — direct clicks from GitHub may return a 403 .
 
 ## State Machine
 ```
