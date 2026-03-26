@@ -144,7 +144,14 @@ Deliberately simplified to one beneficiary per contract. This eliminates share r
 - [x] Security audit tests written
 - [x] Deployed to RSK Testnet
 - [x] Contract verified on explorer
-- [ ] UI — in progress (Replit, HTML/CSS/JS + Ethers.js)
+- [x] UI — Complete (Replit, HTML/CSS/JS + Ethers.js)
+
+## Live Demo
+
+The dApp UI is deployed and accessible at:
+https://rootstock-d-app-deploy--babongilehlaban.replit.app
+
+Connect MetaMask on RSK Testnet (Chain ID 31) to interact.
 
 ## Author
 
