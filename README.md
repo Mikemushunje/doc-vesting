@@ -1,6 +1,6 @@
 # DOC Vesting Contract
 
-A time-locked vesting vault for DOC tokens built on Rootstock (RSK) blockchain.
+A time-locked vesting vault for DOC tokens built on Rootstock.
 
 ## What It Does
 
