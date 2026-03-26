@@ -11,10 +11,10 @@ portion — which stays in the contract.
 
 ## Contract Address (RSK Testnet)
 ```
-0x4F2114dd5f80E54571C75F4eaB3E2fF913755DCa
+0x319d7bd91bBf72E8F4cBc140C4DBf67e4Fc7Ce4b
 ```
 Verified on Rootstock Testnet Explorer:
-https://explorer.testnet.rootstock.io/address/0x4F2114dd5f80E54571C75F4eaB3E2fF913755DCa
+https://explorer.testnet.rootstock.io/address/0x319d7bd91bBf72E8F4cBc140C4DBf67e4Fc7Ce4b
 
 > Note: Copy and paste the link above directly into your browser — direct clicks from GitHub may return a 403 .
 
